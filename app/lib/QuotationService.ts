@@ -1,7 +1,7 @@
 import { customAlphabet } from "nanoid";
 import type { QuotationRequest, QuotationResponse } from "./types";
 
-const digits = customAlphabet("012345678", 6);
+const digits = customAlphabet("0123456789", 6);
 export function generateInvoice(date = new Date()) {
   return `KFM-PI-${date.getFullYear()}-${digits()}`;
 }

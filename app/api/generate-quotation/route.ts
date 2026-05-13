@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json(
       { message: "Invalid request payload" },
-      { status: 500 },
+      { status: 400 },
     );
   }
 }
