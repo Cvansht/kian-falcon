@@ -4,6 +4,7 @@ import { useState } from "react";
 import ResultCard from "./ResultCard";
 import type { QuotationResponse } from "../lib/types";
 import { quotationSchema } from "../lib/validation/quotation";
+import { exportQuotationPdf } from "../lib/quotationPdf";
 
 type FormValues = {
   client_name: string;
@@ -28,6 +29,7 @@ export default function QuotationForm() {
   const [submitError, setSubmitError] = useState<string>("");
   const [result, setResult] = useState<QuotationResponse | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
 
   function updateValue(name: keyof FormValues, value: string) {
     setValues((current) => ({ ...current, [name]: value }));
@@ -93,6 +95,22 @@ export default function QuotationForm() {
       setSubmitError("Unable to reach the server. Please retry.");
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function handleExportPdf() {
+    if (!result) {
+      return;
+    }
+
+    try {
+      setIsExportingPdf(true);
+      setSubmitError("");
+      await exportQuotationPdf(result);
+    } catch {
+      setSubmitError("Unable to generate the PDF right now. Please retry.");
+    } finally {
+      setIsExportingPdf(false);
     }
   }
 
@@ -193,7 +211,13 @@ export default function QuotationForm() {
         </button>
       </form>
 
-      {result ? <ResultCard result={result} /> : null}
+      {result ? (
+        <ResultCard
+          result={result}
+          onExportPdf={handleExportPdf}
+          isExportingPdf={isExportingPdf}
+        />
+      ) : null}
     </section>
   );
 }
